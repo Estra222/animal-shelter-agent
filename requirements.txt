@@ -1,0 +1,7 @@
+streamlit>=1.28.0
+duckdb>=0.9.0
+requests>=2.31.0
+pandas>=2.0.0
+mindsdb-sdk>=1.0.0
+jupyter>=1.0.0
+ipython>=8.0.0

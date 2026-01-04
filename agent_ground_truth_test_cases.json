@@ -1,0 +1,1534 @@
+{
+  "project": "Austin Animal Shelter",
+  "description": "Ground truth test cases for MindsDB agent validation",
+  "total_test_cases": 11,
+  "test_cases": [
+    {
+      "id": 1,
+      "name": "Outcome Distribution",
+      "business_scenario": "Understand the overall distribution of animal outcomes",
+      "natural_language_question": "What are the different animal outcomes and how many animals have each outcome?",
+      "ground_truth_sql": "SELECT outcome_type, COUNT(*) as total, \n                   ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) as percentage,\n                   ROUND(AVG(days_in_shelter), 1) as avg_days\n            FROM fact_animal_outcome f\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            GROUP BY outcome_type\n            ORDER BY total DESC",
+      "expected_columns": [
+        "outcome_type",
+        "total",
+        "percentage",
+        "avg_days"
+      ],
+      "expected_results": [
+        {
+          "outcome_type": "Adoption",
+          "total": 83805,
+          "percentage": 48.7,
+          "avg_days": 33.5
+        },
+        {
+          "outcome_type": "Transfer",
+          "total": 48059,
+          "percentage": 27.9,
+          "avg_days": 10.0
+        },
+        {
+          "outcome_type": "Return to Owner",
+          "total": 25596,
+          "percentage": 14.9,
+          "avg_days": 3.7
+        },
+        {
+          "outcome_type": "Euthanasia",
+          "total": 10693,
+          "percentage": 6.2,
+          "avg_days": 5.7
+        },
+        {
+          "outcome_type": "Died",
+          "total": 1628,
+          "percentage": 0.9,
+          "avg_days": 12.9
+        },
+        {
+          "outcome_type": "Rto-Adopt",
+          "total": 1239,
+          "percentage": 0.7,
+          "avg_days": 17.3
+        },
+        {
+          "outcome_type": "Disposal",
+          "total": 859,
+          "percentage": 0.5,
+          "avg_days": 5.4
+        },
+        {
+          "outcome_type": "Missing",
+          "total": 90,
+          "percentage": 0.1,
+          "avg_days": 52.2
+        },
+        {
+          "outcome_type": "Unknown",
+          "total": 42,
+          "percentage": 0.0,
+          "avg_days": 18.0
+        },
+        {
+          "outcome_type": "Relocate",
+          "total": 26,
+          "percentage": 0.0,
+          "avg_days": 5.6
+        },
+        {
+          "outcome_type": "Stolen",
+          "total": 5,
+          "percentage": 0.0,
+          "avg_days": 87.6
+        },
+        {
+          "outcome_type": "Lost",
+          "total": 2,
+          "percentage": 0.0,
+          "avg_days": 18.0
+        }
+      ],
+      "result_count": 12
+    },
+    {
+      "id": 2,
+      "name": "Top Breed Groups Overall",
+      "business_scenario": "Identify which breed groups are most common in shelter",
+      "natural_language_question": "What are the top 10 most common breed groups in the shelter?",
+      "ground_truth_sql": "SELECT breed_group, COUNT(*) as total,\n                   ROUND(AVG(days_in_shelter), 1) as avg_days\n            FROM fact_animal_outcome f\n            JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key\n            GROUP BY breed_group\n            ORDER BY total DESC\n            LIMIT 10",
+      "expected_columns": [
+        "breed_group",
+        "total",
+        "avg_days"
+      ],
+      "expected_results": [
+        {
+          "breed_group": "Mixed",
+          "total": 57743,
+          "avg_days": 20.1
+        },
+        {
+          "breed_group": "Other",
+          "total": 38759,
+          "avg_days": 20.7
+        },
+        {
+          "breed_group": "Working",
+          "total": 31256,
+          "avg_days": 26.7
+        },
+        {
+          "breed_group": "Toy",
+          "total": 17049,
+          "avg_days": 10.2
+        },
+        {
+          "breed_group": "Sporting",
+          "total": 16339,
+          "avg_days": 21.5
+        },
+        {
+          "breed_group": "Terrier",
+          "total": 6218,
+          "avg_days": 16.5
+        },
+        {
+          "breed_group": "Hound",
+          "total": 4680,
+          "avg_days": 14.1
+        }
+      ],
+      "result_count": 7
+    },
+    {
+      "id": 3,
+      "name": "Adoption Success Rate by Primary Breed",
+      "business_scenario": "Identify which breeds (across all animal types) are most likely to be adopted",
+      "natural_language_question": "What are the top 5 primary breeds with the highest adoption rates?",
+      "ground_truth_sql": "SELECT primary_breed,\n                   COUNT(*) as total_animals,\n                   SUM(CASE WHEN outcome_type = 'Adoption' THEN 1 ELSE 0 END) as adoptions,\n                   ROUND(100.0 * SUM(CASE WHEN outcome_type = 'Adoption' THEN 1 ELSE 0 END) / COUNT(*), 1) as adoption_rate\n            FROM fact_animal_outcome f\n            JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            GROUP BY primary_breed\n            ORDER BY adoption_rate DESC, total_animals DESC\n            LIMIT 5",
+      "expected_columns": [
+        "primary_breed",
+        "total_animals",
+        "adoptions",
+        "adoption_rate"
+      ],
+      "expected_results": [
+        {
+          "primary_breed": "Treeing Cur",
+          "total_animals": 13,
+          "adoptions": 13,
+          "adoption_rate": 100.0
+        },
+        {
+          "primary_breed": "Lop-Mini",
+          "total_animals": 10,
+          "adoptions": 10,
+          "adoption_rate": 100.0
+        },
+        {
+          "primary_breed": "Netherlnd Dwarf",
+          "total_animals": 7,
+          "adoptions": 7,
+          "adoption_rate": 100.0
+        },
+        {
+          "primary_breed": "Feist",
+          "total_animals": 6,
+          "adoptions": 6,
+          "adoption_rate": 100.0
+        },
+        {
+          "primary_breed": "Munchkin Shorthair Mix",
+          "total_animals": 5,
+          "adoptions": 5,
+          "adoption_rate": 100.0
+        }
+      ],
+      "result_count": 5
+    },
+    {
+      "id": 4,
+      "name": "High Demand Animals (Short Stay Before Adoption/Transfer) by Breed",
+      "business_scenario": "Identify adoptable pet breeds in highest demand with short availability windows",
+      "natural_language_question": "What are the top 5 adoptable pet breeds with the shortest average stay before adoption or transfer?",
+      "ground_truth_sql": "SELECT primary_breed,\n                   COUNT(*) as count,\n                   ROUND(AVG(days_in_shelter), 1) as avg_days_before_outcome\n            FROM fact_animal_outcome f\n            JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            WHERE outcome_type IN ('Adoption', 'Transfer')\n              AND animal_type IN ('Dog', 'Cat', 'Rabbit', 'Livestock')\n              AND primary_breed != 'Unknown'\n            GROUP BY primary_breed\n            ORDER BY avg_days_before_outcome ASC, count DESC\n            LIMIT 5",
+      "expected_columns": [
+        "primary_breed",
+        "count",
+        "avg_days_before_outcome"
+      ],
+      "expected_results": [
+        {
+          "primary_breed": "Bernese Hound",
+          "count": 1,
+          "avg_days_before_outcome": 0.0
+        },
+        {
+          "primary_breed": "Alaskan Klee Kai",
+          "count": 1,
+          "avg_days_before_outcome": 1.0
+        },
+        {
+          "primary_breed": "Birman Mix",
+          "count": 2,
+          "avg_days_before_outcome": 1.5
+        },
+        {
+          "primary_breed": "Colorpoint Mix",
+          "count": 3,
+          "avg_days_before_outcome": 2.0
+        },
+        {
+          "primary_breed": "Lowchen Mix",
+          "count": 1,
+          "avg_days_before_outcome": 2.0
+        }
+      ],
+      "result_count": 5
+    },
+    {
+      "id": 5,
+      "name": "High Need Animals (Longest Stay and Problem Conditions)",
+      "business_scenario": "Identify animals with longest stays and health issues needing attention",
+      "natural_language_question": "What are the top 10 combinations of primary breed and intake conditions with the longest average stay?",
+      "ground_truth_sql": "SELECT primary_breed, intake_condition,\n                   COUNT(*) as count,\n                   ROUND(AVG(days_in_shelter), 1) as avg_days_in_shelter\n            FROM fact_animal_outcome f\n            JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key\n            JOIN dim_intake_details id ON f.intake_details_key = id.intake_details_key\n            GROUP BY primary_breed, intake_condition\n            HAVING COUNT(*) >= 5\n            ORDER BY avg_days_in_shelter DESC\n            LIMIT 10",
+      "expected_columns": [
+        "primary_breed",
+        "intake_condition",
+        "count",
+        "avg_days_in_shelter"
+      ],
+      "expected_results": [
+        {
+          "primary_breed": "Treeing Walker Coonhound Mix",
+          "intake_condition": "Injured",
+          "count": 5,
+          "avg_days_in_shelter": 122.8
+        },
+        {
+          "primary_breed": "Cymric Mix",
+          "intake_condition": "Normal",
+          "count": 6,
+          "avg_days_in_shelter": 90.7
+        },
+        {
+          "primary_breed": "American Shorthair",
+          "intake_condition": "Nursing",
+          "count": 10,
+          "avg_days_in_shelter": 84.3
+        },
+        {
+          "primary_breed": "Dutch Shepherd Mix",
+          "intake_condition": "Injured",
+          "count": 5,
+          "avg_days_in_shelter": 77.4
+        },
+        {
+          "primary_breed": "Staffordshire Mix",
+          "intake_condition": "Nursing",
+          "count": 6,
+          "avg_days_in_shelter": 77.0
+        },
+        {
+          "primary_breed": "Rhod Ridgeback Mix",
+          "intake_condition": "Injured",
+          "count": 6,
+          "avg_days_in_shelter": 72.5
+        },
+        {
+          "primary_breed": "Blue Lacy Mix",
+          "intake_condition": "Injured",
+          "count": 10,
+          "avg_days_in_shelter": 69.3
+        },
+        {
+          "primary_breed": "Black Mouth Cur Mix",
+          "intake_condition": "Injured",
+          "count": 9,
+          "avg_days_in_shelter": 67.6
+        },
+        {
+          "primary_breed": "Beauceron",
+          "intake_condition": "Normal",
+          "count": 7,
+          "avg_days_in_shelter": 65.9
+        },
+        {
+          "primary_breed": "American Bulldog",
+          "intake_condition": "Medical",
+          "count": 6,
+          "avg_days_in_shelter": 65.8
+        }
+      ],
+      "result_count": 10
+    },
+    {
+      "id": 6,
+      "name": "Sick and Injured Animals Outcomes",
+      "business_scenario": "Understand outcomes for animals in poor health conditions (most common combinations)",
+      "natural_language_question": "How do sick or injured animals typically fare? What are the most common outcome patterns for animals with health conditions?",
+      "ground_truth_sql": "SELECT intake_condition, outcome_type, COUNT(*) as count,\n                   ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY intake_condition), 1) as pct_of_condition\n            FROM fact_animal_outcome f\n            JOIN dim_intake_details id ON f.intake_details_key = id.intake_details_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            WHERE has_condition_flag = 1\n            GROUP BY intake_condition, outcome_type\n            HAVING COUNT(*) >= 30\n            ORDER BY count DESC",
+      "expected_columns": [
+        "intake_condition",
+        "outcome_type",
+        "count",
+        "pct_of_condition"
+      ],
+      "expected_results": [
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Adoption",
+          "count": 3280,
+          "pct_of_condition": 31.0
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Transfer",
+          "count": 2829,
+          "pct_of_condition": 26.7
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Euthanasia",
+          "count": 2705,
+          "pct_of_condition": 25.5
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Transfer",
+          "count": 2573,
+          "pct_of_condition": 33.0
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Euthanasia",
+          "count": 2499,
+          "pct_of_condition": 32.1
+        },
+        {
+          "intake_condition": "Nursing",
+          "outcome_type": "Transfer",
+          "count": 2367,
+          "pct_of_condition": 62.1
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Adoption",
+          "count": 1840,
+          "pct_of_condition": 23.6
+        },
+        {
+          "intake_condition": "Neonatal",
+          "outcome_type": "Transfer",
+          "count": 1295,
+          "pct_of_condition": 70.0
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Return to Owner",
+          "count": 1149,
+          "pct_of_condition": 10.8
+        },
+        {
+          "intake_condition": "Nursing",
+          "outcome_type": "Adoption",
+          "count": 1132,
+          "pct_of_condition": 29.7
+        },
+        {
+          "intake_condition": "Neonatal",
+          "outcome_type": "Adoption",
+          "count": 503,
+          "pct_of_condition": 27.2
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Return to Owner",
+          "count": 351,
+          "pct_of_condition": 4.5
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Died",
+          "count": 319,
+          "pct_of_condition": 3.0
+        },
+        {
+          "intake_condition": "Medical",
+          "outcome_type": "Adoption",
+          "count": 269,
+          "pct_of_condition": 48.1
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Died",
+          "count": 258,
+          "pct_of_condition": 3.3
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Disposal",
+          "count": 220,
+          "pct_of_condition": 2.1
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Disposal",
+          "count": 200,
+          "pct_of_condition": 2.6
+        },
+        {
+          "intake_condition": "Aged",
+          "outcome_type": "Return to Owner",
+          "count": 199,
+          "pct_of_condition": 38.9
+        },
+        {
+          "intake_condition": "Medical",
+          "outcome_type": "Transfer",
+          "count": 197,
+          "pct_of_condition": 35.2
+        },
+        {
+          "intake_condition": "Other",
+          "outcome_type": "Adoption",
+          "count": 141,
+          "pct_of_condition": 45.0
+        },
+        {
+          "intake_condition": "Other",
+          "outcome_type": "Transfer",
+          "count": 127,
+          "pct_of_condition": 40.6
+        },
+        {
+          "intake_condition": "Aged",
+          "outcome_type": "Adoption",
+          "count": 119,
+          "pct_of_condition": 23.2
+        },
+        {
+          "intake_condition": "Nursing",
+          "outcome_type": "Died",
+          "count": 118,
+          "pct_of_condition": 3.1
+        },
+        {
+          "intake_condition": "Aged",
+          "outcome_type": "Transfer",
+          "count": 111,
+          "pct_of_condition": 21.7
+        },
+        {
+          "intake_condition": "Nursing",
+          "outcome_type": "Return to Owner",
+          "count": 104,
+          "pct_of_condition": 2.7
+        },
+        {
+          "intake_condition": "Nursing",
+          "outcome_type": "Euthanasia",
+          "count": 93,
+          "pct_of_condition": 2.4
+        },
+        {
+          "intake_condition": "Injured",
+          "outcome_type": "Rto-Adopt",
+          "count": 91,
+          "pct_of_condition": 0.9
+        },
+        {
+          "intake_condition": "Feral",
+          "outcome_type": "Transfer",
+          "count": 90,
+          "pct_of_condition": 69.8
+        },
+        {
+          "intake_condition": "Aged",
+          "outcome_type": "Euthanasia",
+          "count": 83,
+          "pct_of_condition": 16.2
+        },
+        {
+          "intake_condition": "Pregnant",
+          "outcome_type": "Transfer",
+          "count": 77,
+          "pct_of_condition": 55.4
+        },
+        {
+          "intake_condition": "Sick",
+          "outcome_type": "Rto-Adopt",
+          "count": 65,
+          "pct_of_condition": 0.8
+        },
+        {
+          "intake_condition": "Pregnant",
+          "outcome_type": "Adoption",
+          "count": 62,
+          "pct_of_condition": 44.6
+        },
+        {
+          "intake_condition": "Neonatal",
+          "outcome_type": "Died",
+          "count": 53,
+          "pct_of_condition": 2.9
+        },
+        {
+          "intake_condition": "Medical",
+          "outcome_type": "Return to Owner",
+          "count": 50,
+          "pct_of_condition": 8.9
+        },
+        {
+          "intake_condition": "Other",
+          "outcome_type": "Return to Owner",
+          "count": 45,
+          "pct_of_condition": 14.4
+        },
+        {
+          "intake_condition": "Medical",
+          "outcome_type": "Euthanasia",
+          "count": 43,
+          "pct_of_condition": 7.7
+        },
+        {
+          "intake_condition": "Feral",
+          "outcome_type": "Adoption",
+          "count": 39,
+          "pct_of_condition": 30.2
+        },
+        {
+          "intake_condition": "Med Attn",
+          "outcome_type": "Transfer",
+          "count": 36,
+          "pct_of_condition": 100.0
+        },
+        {
+          "intake_condition": "Behavior",
+          "outcome_type": "Adoption",
+          "count": 32,
+          "pct_of_condition": 100.0
+        }
+      ],
+      "result_count": 39
+    },
+    {
+      "id": 7,
+      "name": "Stay Duration by Outcome",
+      "business_scenario": "Understand how long animals typically stay for each outcome type",
+      "natural_language_question": "For each outcome type, what is the distribution of how long animals stay?",
+      "ground_truth_sql": "SELECT \n              CASE \n                WHEN days_in_shelter < 7 THEN '0-7 days'\n                WHEN days_in_shelter < 30 THEN '8-29 days'\n                WHEN days_in_shelter < 90 THEN '30-89 days'\n                ELSE '90+ days'\n              END as stay_duration,\n              outcome_type,\n              COUNT(*) as count\n            FROM fact_animal_outcome f\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            GROUP BY stay_duration, outcome_type\n            ORDER BY CASE WHEN stay_duration = '0-7 days' THEN 1 \n                         WHEN stay_duration = '8-29 days' THEN 2\n                         WHEN stay_duration = '30-89 days' THEN 3\n                         ELSE 4 END, count DESC",
+      "expected_columns": [
+        "stay_duration",
+        "outcome_type",
+        "count"
+      ],
+      "expected_results": [
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Transfer",
+          "count": 32473
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Adoption",
+          "count": 26126
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Return to Owner",
+          "count": 20854
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Euthanasia",
+          "count": 9386
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Died",
+          "count": 1043
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Disposal",
+          "count": 745
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Rto-Adopt",
+          "count": 519
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Unknown",
+          "count": 22
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Relocate",
+          "count": 18
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Missing",
+          "count": 12
+        },
+        {
+          "stay_duration": "0-7 days",
+          "outcome_type": "Stolen",
+          "count": 1
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Adoption",
+          "count": 28737
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Transfer",
+          "count": 12012
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Return to Owner",
+          "count": 4549
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Euthanasia",
+          "count": 927
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Rto-Adopt",
+          "count": 573
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Died",
+          "count": 426
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Disposal",
+          "count": 93
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Missing",
+          "count": 23
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Unknown",
+          "count": 11
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Relocate",
+          "count": 7
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Stolen",
+          "count": 3
+        },
+        {
+          "stay_duration": "8-29 days",
+          "outcome_type": "Lost",
+          "count": 2
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Adoption",
+          "count": 22188
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Transfer",
+          "count": 2889
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Euthanasia",
+          "count": 267
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Return to Owner",
+          "count": 156
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Died",
+          "count": 121
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Rto-Adopt",
+          "count": 105
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Missing",
+          "count": 36
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Disposal",
+          "count": 16
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Unknown",
+          "count": 7
+        },
+        {
+          "stay_duration": "30-89 days",
+          "outcome_type": "Relocate",
+          "count": 1
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Adoption",
+          "count": 6754
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Transfer",
+          "count": 685
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Euthanasia",
+          "count": 113
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Rto-Adopt",
+          "count": 42
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Died",
+          "count": 38
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Return to Owner",
+          "count": 37
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Missing",
+          "count": 19
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Disposal",
+          "count": 5
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Unknown",
+          "count": 2
+        },
+        {
+          "stay_duration": "90+ days",
+          "outcome_type": "Stolen",
+          "count": 1
+        }
+      ],
+      "result_count": 43
+    },
+    {
+      "id": 8,
+      "name": "Monthly Outcome Trends 2016",
+      "business_scenario": "Track outcome patterns across recent months",
+      "natural_language_question": "What are the monthly outcome trends for 2016?",
+      "ground_truth_sql": "SELECT d.month, outcome_type, COUNT(*) as count\n            FROM fact_animal_outcome f\n            JOIN dim_date d ON f.outcome_date_key = d.date_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            WHERE d.year = 2016\n            GROUP BY d.month, outcome_type\n            ORDER BY d.month, outcome_type",
+      "expected_columns": [
+        "month",
+        "outcome_type",
+        "count"
+      ],
+      "expected_results": [
+        {
+          "month": 1,
+          "outcome_type": "Adoption",
+          "count": 600
+        },
+        {
+          "month": 1,
+          "outcome_type": "Died",
+          "count": 7
+        },
+        {
+          "month": 1,
+          "outcome_type": "Disposal",
+          "count": 1
+        },
+        {
+          "month": 1,
+          "outcome_type": "Euthanasia",
+          "count": 64
+        },
+        {
+          "month": 1,
+          "outcome_type": "Missing",
+          "count": 2
+        },
+        {
+          "month": 1,
+          "outcome_type": "Relocate",
+          "count": 1
+        },
+        {
+          "month": 1,
+          "outcome_type": "Return to Owner",
+          "count": 275
+        },
+        {
+          "month": 1,
+          "outcome_type": "Transfer",
+          "count": 351
+        },
+        {
+          "month": 2,
+          "outcome_type": "Adoption",
+          "count": 536
+        },
+        {
+          "month": 2,
+          "outcome_type": "Died",
+          "count": 15
+        },
+        {
+          "month": 2,
+          "outcome_type": "Disposal",
+          "count": 2
+        },
+        {
+          "month": 2,
+          "outcome_type": "Euthanasia",
+          "count": 74
+        },
+        {
+          "month": 2,
+          "outcome_type": "Missing",
+          "count": 2
+        },
+        {
+          "month": 2,
+          "outcome_type": "Return to Owner",
+          "count": 255
+        },
+        {
+          "month": 2,
+          "outcome_type": "Transfer",
+          "count": 252
+        },
+        {
+          "month": 3,
+          "outcome_type": "Adoption",
+          "count": 540
+        },
+        {
+          "month": 3,
+          "outcome_type": "Died",
+          "count": 13
+        },
+        {
+          "month": 3,
+          "outcome_type": "Disposal",
+          "count": 30
+        },
+        {
+          "month": 3,
+          "outcome_type": "Euthanasia",
+          "count": 206
+        },
+        {
+          "month": 3,
+          "outcome_type": "Relocate",
+          "count": 1
+        },
+        {
+          "month": 3,
+          "outcome_type": "Return to Owner",
+          "count": 309
+        },
+        {
+          "month": 3,
+          "outcome_type": "Transfer",
+          "count": 314
+        },
+        {
+          "month": 4,
+          "outcome_type": "Adoption",
+          "count": 453
+        },
+        {
+          "month": 4,
+          "outcome_type": "Died",
+          "count": 14
+        },
+        {
+          "month": 4,
+          "outcome_type": "Disposal",
+          "count": 8
+        },
+        {
+          "month": 4,
+          "outcome_type": "Euthanasia",
+          "count": 91
+        },
+        {
+          "month": 4,
+          "outcome_type": "Return to Owner",
+          "count": 298
+        },
+        {
+          "month": 4,
+          "outcome_type": "Transfer",
+          "count": 488
+        },
+        {
+          "month": 5,
+          "outcome_type": "Adoption",
+          "count": 612
+        },
+        {
+          "month": 5,
+          "outcome_type": "Died",
+          "count": 27
+        },
+        {
+          "month": 5,
+          "outcome_type": "Disposal",
+          "count": 4
+        },
+        {
+          "month": 5,
+          "outcome_type": "Euthanasia",
+          "count": 141
+        },
+        {
+          "month": 5,
+          "outcome_type": "Return to Owner",
+          "count": 336
+        },
+        {
+          "month": 5,
+          "outcome_type": "Transfer",
+          "count": 558
+        },
+        {
+          "month": 6,
+          "outcome_type": "Adoption",
+          "count": 841
+        },
+        {
+          "month": 6,
+          "outcome_type": "Died",
+          "count": 15
+        },
+        {
+          "month": 6,
+          "outcome_type": "Disposal",
+          "count": 3
+        },
+        {
+          "month": 6,
+          "outcome_type": "Euthanasia",
+          "count": 110
+        },
+        {
+          "month": 6,
+          "outcome_type": "Missing",
+          "count": 3
+        },
+        {
+          "month": 6,
+          "outcome_type": "Return to Owner",
+          "count": 246
+        },
+        {
+          "month": 6,
+          "outcome_type": "Transfer",
+          "count": 416
+        },
+        {
+          "month": 7,
+          "outcome_type": "Adoption",
+          "count": 982
+        },
+        {
+          "month": 7,
+          "outcome_type": "Died",
+          "count": 13
+        },
+        {
+          "month": 7,
+          "outcome_type": "Disposal",
+          "count": 4
+        },
+        {
+          "month": 7,
+          "outcome_type": "Euthanasia",
+          "count": 70
+        },
+        {
+          "month": 7,
+          "outcome_type": "Missing",
+          "count": 3
+        },
+        {
+          "month": 7,
+          "outcome_type": "Return to Owner",
+          "count": 227
+        },
+        {
+          "month": 7,
+          "outcome_type": "Transfer",
+          "count": 373
+        },
+        {
+          "month": 8,
+          "outcome_type": "Adoption",
+          "count": 722
+        },
+        {
+          "month": 8,
+          "outcome_type": "Died",
+          "count": 12
+        },
+        {
+          "month": 8,
+          "outcome_type": "Disposal",
+          "count": 3
+        },
+        {
+          "month": 8,
+          "outcome_type": "Euthanasia",
+          "count": 90
+        },
+        {
+          "month": 8,
+          "outcome_type": "Return to Owner",
+          "count": 228
+        },
+        {
+          "month": 8,
+          "outcome_type": "Transfer",
+          "count": 483
+        },
+        {
+          "month": 9,
+          "outcome_type": "Adoption",
+          "count": 725
+        },
+        {
+          "month": 9,
+          "outcome_type": "Died",
+          "count": 22
+        },
+        {
+          "month": 9,
+          "outcome_type": "Disposal",
+          "count": 6
+        },
+        {
+          "month": 9,
+          "outcome_type": "Euthanasia",
+          "count": 83
+        },
+        {
+          "month": 9,
+          "outcome_type": "Missing",
+          "count": 4
+        },
+        {
+          "month": 9,
+          "outcome_type": "Return to Owner",
+          "count": 263
+        },
+        {
+          "month": 9,
+          "outcome_type": "Transfer",
+          "count": 546
+        },
+        {
+          "month": 10,
+          "outcome_type": "Adoption",
+          "count": 623
+        },
+        {
+          "month": 10,
+          "outcome_type": "Died",
+          "count": 16
+        },
+        {
+          "month": 10,
+          "outcome_type": "Disposal",
+          "count": 8
+        },
+        {
+          "month": 10,
+          "outcome_type": "Euthanasia",
+          "count": 94
+        },
+        {
+          "month": 10,
+          "outcome_type": "Relocate",
+          "count": 1
+        },
+        {
+          "month": 10,
+          "outcome_type": "Return to Owner",
+          "count": 261
+        },
+        {
+          "month": 10,
+          "outcome_type": "Transfer",
+          "count": 407
+        },
+        {
+          "month": 11,
+          "outcome_type": "Adoption",
+          "count": 707
+        },
+        {
+          "month": 11,
+          "outcome_type": "Died",
+          "count": 11
+        },
+        {
+          "month": 11,
+          "outcome_type": "Disposal",
+          "count": 1
+        },
+        {
+          "month": 11,
+          "outcome_type": "Euthanasia",
+          "count": 76
+        },
+        {
+          "month": 11,
+          "outcome_type": "Relocate",
+          "count": 1
+        },
+        {
+          "month": 11,
+          "outcome_type": "Return to Owner",
+          "count": 313
+        },
+        {
+          "month": 11,
+          "outcome_type": "Transfer",
+          "count": 333
+        },
+        {
+          "month": 12,
+          "outcome_type": "Adoption",
+          "count": 736
+        },
+        {
+          "month": 12,
+          "outcome_type": "Died",
+          "count": 11
+        },
+        {
+          "month": 12,
+          "outcome_type": "Disposal",
+          "count": 3
+        },
+        {
+          "month": 12,
+          "outcome_type": "Euthanasia",
+          "count": 54
+        },
+        {
+          "month": 12,
+          "outcome_type": "Missing",
+          "count": 3
+        },
+        {
+          "month": 12,
+          "outcome_type": "Return to Owner",
+          "count": 279
+        },
+        {
+          "month": 12,
+          "outcome_type": "Transfer",
+          "count": 300
+        }
+      ],
+      "result_count": 82
+    },
+    {
+      "id": 9,
+      "name": "Gender Distribution by Outcome",
+      "business_scenario": "Understand if gender affects outcomes",
+      "natural_language_question": "Do male and female animals have different outcome patterns?",
+      "ground_truth_sql": "SELECT \n              CASE \n                WHEN is_male = 1 THEN 'Male'\n                WHEN is_female = 1 THEN 'Female'\n                ELSE 'Unknown'\n              END as gender,\n              outcome_type, \n              COUNT(*) as count,\n              ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY CASE WHEN is_male = 1 THEN 'Male' WHEN is_female = 1 THEN 'Female' ELSE 'Unknown' END), 1) as pct_of_gender\n            FROM fact_animal_outcome f\n            JOIN dim_sex_on_outcome s ON f.sex_key = s.sex_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            GROUP BY gender, outcome_type\n            ORDER BY gender, count DESC",
+      "expected_columns": [
+        "gender",
+        "outcome_type",
+        "count",
+        "pct_of_gender"
+      ],
+      "expected_results": [
+        {
+          "gender": "Female",
+          "outcome_type": "Adoption",
+          "count": 41325,
+          "pct_of_gender": 54.2
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Transfer",
+          "count": 21262,
+          "pct_of_gender": 27.9
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Return to Owner",
+          "count": 10608,
+          "pct_of_gender": 13.9
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Euthanasia",
+          "count": 1904,
+          "pct_of_gender": 2.5
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Died",
+          "count": 556,
+          "pct_of_gender": 0.7
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Rto-Adopt",
+          "count": 502,
+          "pct_of_gender": 0.7
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Disposal",
+          "count": 82,
+          "pct_of_gender": 0.1
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Missing",
+          "count": 46,
+          "pct_of_gender": 0.1
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Unknown",
+          "count": 16,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Relocate",
+          "count": 5,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Stolen",
+          "count": 2,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Female",
+          "outcome_type": "Lost",
+          "count": 1,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Adoption",
+          "count": 42176,
+          "pct_of_gender": 51.1
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Transfer",
+          "count": 21463,
+          "pct_of_gender": 26.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Return to Owner",
+          "count": 14738,
+          "pct_of_gender": 17.9
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Euthanasia",
+          "count": 2529,
+          "pct_of_gender": 3.1
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Rto-Adopt",
+          "count": 736,
+          "pct_of_gender": 0.9
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Died",
+          "count": 636,
+          "pct_of_gender": 0.8
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Disposal",
+          "count": 127,
+          "pct_of_gender": 0.2
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Missing",
+          "count": 38,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Unknown",
+          "count": 17,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Stolen",
+          "count": 3,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Relocate",
+          "count": 2,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Male",
+          "outcome_type": "Lost",
+          "count": 1,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Euthanasia",
+          "count": 6260,
+          "pct_of_gender": 47.2
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Transfer",
+          "count": 5334,
+          "pct_of_gender": 40.2
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Disposal",
+          "count": 650,
+          "pct_of_gender": 4.9
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Died",
+          "count": 436,
+          "pct_of_gender": 3.3
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Adoption",
+          "count": 304,
+          "pct_of_gender": 2.3
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Return to Owner",
+          "count": 250,
+          "pct_of_gender": 1.9
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Relocate",
+          "count": 19,
+          "pct_of_gender": 0.1
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Unknown",
+          "count": 9,
+          "pct_of_gender": 0.1
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Missing",
+          "count": 6,
+          "pct_of_gender": 0.0
+        },
+        {
+          "gender": "Unknown",
+          "outcome_type": "Rto-Adopt",
+          "count": 1,
+          "pct_of_gender": 0.0
+        }
+      ],
+      "result_count": 34
+    },
+    {
+      "id": 10,
+      "name": "Intake Type Analysis",
+      "business_scenario": "Understand which intake methods result in better outcomes",
+      "natural_language_question": "What are the most common intake types and their outcome distributions?",
+      "ground_truth_sql": "SELECT intake_type, COUNT(*) as total,\n                   ROUND(100.0 * SUM(CASE WHEN outcome_type IN ('Adoption', 'Transfer', 'Return to Owner') THEN 1 ELSE 0 END) / COUNT(*), 1) as live_outcome_pct,\n                   ROUND(AVG(days_in_shelter), 1) as avg_days\n            FROM fact_animal_outcome f\n            JOIN dim_intake_details id ON f.intake_details_key = id.intake_details_key\n            JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key\n            GROUP BY intake_type\n            ORDER BY total DESC",
+      "expected_columns": [
+        "intake_type",
+        "total",
+        "live_outcome_pct",
+        "avg_days"
+      ],
+      "expected_results": [
+        {
+          "intake_type": "Stray",
+          "total": 117988,
+          "live_outcome_pct": 95.1,
+          "avg_days": 19.8
+        },
+        {
+          "intake_type": "Owner Surrender",
+          "total": 35161,
+          "live_outcome_pct": 95.7,
+          "avg_days": 25.9
+        },
+        {
+          "intake_type": "Public Assist",
+          "total": 10346,
+          "live_outcome_pct": 92.3,
+          "avg_days": 17.8
+        },
+        {
+          "intake_type": "Wildlife",
+          "total": 6416,
+          "live_outcome_pct": 1.8,
+          "avg_days": 1.8
+        },
+        {
+          "intake_type": "Abandoned",
+          "total": 1869,
+          "live_outcome_pct": 97.5,
+          "avg_days": 27.1
+        },
+        {
+          "intake_type": "Euthanasia Request",
+          "total": 264,
+          "live_outcome_pct": 19.7,
+          "avg_days": 5.3
+        }
+      ],
+      "result_count": 6
+    },
+    {
+      "id": 11,
+      "name": "Reproductive Status by Age Group",
+      "business_scenario": "Understand spay/neuter rates across different age groups",
+      "natural_language_question": "By age group, what percentage of animals are spayed/neutered vs intact?",
+      "ground_truth_sql": "SELECT \n              s.age_group,\n              COUNT(*) as total_animals,\n              SUM(CASE WHEN s.is_intact = 1 THEN 1 ELSE 0 END) as intact_count,\n              ROUND(100.0 * SUM(CASE WHEN s.is_intact = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) as intact_pct,\n              SUM(CASE WHEN s.is_intact = 0 THEN 1 ELSE 0 END) as spayed_neutered_count,\n              ROUND(100.0 * SUM(CASE WHEN s.is_intact = 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as spayed_neutered_pct\n            FROM fact_animal_outcome f\n            JOIN dim_sex_on_outcome s ON f.sex_key = s.sex_key\n            GROUP BY s.age_group\n            ORDER BY \n              CASE \n                WHEN s.age_group = 'Under 1 Year' THEN 1\n                WHEN s.age_group = '1-5 Years' THEN 2\n                WHEN s.age_group = '5-10 Years' THEN 3\n                WHEN s.age_group = 'Over 10 Years' THEN 4\n                ELSE 5\n              END",
+      "expected_columns": [
+        "age_group",
+        "total_animals",
+        "intact_count",
+        "intact_pct",
+        "spayed_neutered_count",
+        "spayed_neutered_pct"
+      ],
+      "expected_results": [
+        {
+          "age_group": "Under 1 Year",
+          "total_animals": 77602,
+          "intact_count": 24038,
+          "intact_pct": 31.0,
+          "spayed_neutered_count": 53564,
+          "spayed_neutered_pct": 69.0
+        },
+        {
+          "age_group": "1-5 Years",
+          "total_animals": 71733,
+          "intact_count": 15856,
+          "intact_pct": 22.1,
+          "spayed_neutered_count": 55877,
+          "spayed_neutered_pct": 77.9
+        },
+        {
+          "age_group": "5-10 Years",
+          "total_animals": 16148,
+          "intact_count": 2466,
+          "intact_pct": 15.3,
+          "spayed_neutered_count": 13682,
+          "spayed_neutered_pct": 84.7
+        },
+        {
+          "age_group": "Over 10 Years",
+          "total_animals": 6561,
+          "intact_count": 1292,
+          "intact_pct": 19.7,
+          "spayed_neutered_count": 5269,
+          "spayed_neutered_pct": 80.3
+        }
+      ],
+      "result_count": 4
+    }
+  ]
+}

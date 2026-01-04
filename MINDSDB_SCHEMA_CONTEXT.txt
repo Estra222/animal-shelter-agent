@@ -1,0 +1,157 @@
+
+# MINDSDB SCHEMA CONTEXT FOR DATA AGENT
+
+## PROJECT OVERVIEW
+Austin Animal Shelter Analytics - DuckDB Star Schema
+Database: animal_shelter.duckdb
+Primary Fact Table: fact_animal_outcome (172,044 records)
+Grain: One row per animal outcome event
+
+## CRITICAL: TABLE & COLUMN REFERENCE
+
+### FACT TABLE: fact_animal_outcome
+The main fact table for all queries. Has these columns:
+  - fact_id (BIGINT): Unique record ID
+  - animal_id (VARCHAR): Animal identifier
+  - animal_attributes_key (BIGINT): FK to dim_animal_attributes
+  - sex_key (BIGINT): FK to dim_sex_on_outcome
+  - outcome_date_key (INTEGER): FK to dim_date (OUTCOME date, NOT intake)
+  - intake_date_key (INTEGER): FK to dim_date (INTAKE date)
+  - outcome_key (BIGINT): FK to dim_outcome_type
+  - intake_details_key (BIGINT): FK to dim_intake_details
+  - days_in_shelter (BIGINT): Days from intake to outcome
+  - age_at_outcome_days (INTEGER): Animal's age in days
+  - age_at_outcome_years (BIGINT): Animal's age in years
+
+### DIMENSION: dim_animal_attributes
+Animal characteristics. Join with fact on animal_attributes_key.
+  - animal_attributes_key (BIGINT): Primary key
+  - animal_type (VARCHAR): "Dog" or "Cat"
+  - primary_breed (VARCHAR): Primary breed name (e.g., "Golden Retriever", "Domestic Shorthair")
+  - secondary_breed (VARCHAR): Secondary breed or NULL
+  - is_mixed_breed (INTEGER): 1 if mixed, 0 if purebred
+  - breed_group (VARCHAR): Breed category (e.g., "Sporting", "Terrier")
+  - color (VARCHAR): Animal color description
+
+### DIMENSION: dim_date
+Date attributes for both outcome_date_key and intake_date_key.
+Join separately for each date reference.
+  - date_key (BIGINT): Primary key
+  - date (DATE): Actual date
+  - year (BIGINT): Year number
+  - month (BIGINT): Month number (1-12)
+  - month_name (VARCHAR): Month name
+  - day_of_month (BIGINT): Day of month
+  - day_of_week (BIGINT): Day of week (1=Mon, 7=Sun)
+  - day_of_week_name (VARCHAR): "Monday", "Tuesday", etc.
+  - week_of_year (BIGINT): Week number
+  - quarter (BIGINT): Quarter number
+  - is_weekend (BIGINT): 1 if weekend, 0 if weekday
+
+### DIMENSION: dim_outcome_type
+Outcome classifications. Join with fact on outcome_key.
+  - outcome_key (BIGINT): Primary key
+  - outcome_type (VARCHAR): Type ("Adoption", "Transfer", "Return to Owner", "Euthanized", "Died", "Missing")
+  - outcome_subtype (VARCHAR): Detailed subtype
+  - is_live_outcome (INTEGER): 1 if animal survived, 0 if euthanized/died
+  - stay_duration_category (VARCHAR): "Short stay", "Medium stay", "Long stay"
+
+### DIMENSION: dim_sex_on_outcome
+Sex and reproductive status. Join with fact on sex_key.
+  - sex_key (BIGINT): Primary key
+  - sex_upon_outcome (VARCHAR): "Male", "Female", "Unknown"
+  - is_intact (INTEGER): 1 if not spayed/neutered, 0 if fixed
+  - is_male (INTEGER): 1 if male, 0 otherwise
+  - is_female (INTEGER): 1 if female, 0 otherwise
+  - age_group (VARCHAR): Age category
+
+### DIMENSION: dim_intake_details
+Intake circumstances. Join with fact on intake_details_key.
+  - intake_details_key (BIGINT): Primary key
+  - intake_type (VARCHAR): "Stray", "Owner Surrender", "Rescue", "Transfer"
+  - intake_condition (VARCHAR): "Good", "Fair", "Sick", "Injured", "Nursing", "Feral"
+  - condition_severity (VARCHAR): Severity level
+  - has_condition_flag (INTEGER): 1 if has medical condition
+
+Fact Counts by Outcome Type:
+  - Adoption: ~78,900 (45.8%)
+  - Transfer: ~38,100 (22.1%)
+  - Return to Owner: ~38,200 (22.2%)
+  - Euthanized: ~10,400 (6.0%)
+  - Died: ~4,400 (2.6%)
+  - Missing: ~2,000 (1.2%)
+
+## CRITICAL: JOIN SYNTAX RULES
+- ALWAYS use fact_animal_outcome as the base table (alias: f)
+- For outcome date: JOIN dim_date d ON f.outcome_date_key = d.date_key
+- For intake date: JOIN dim_date d_intake ON f.intake_date_key = d_intake.date_key
+- For animal details: JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key
+- For outcome type: JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key
+- For sex: JOIN dim_sex_on_outcome s ON f.sex_key = s.sex_key
+- For intake: JOIN dim_intake_details i ON f.intake_details_key = i.intake_details_key
+
+## CRITICAL: BREED QUERIES
+- Breed information is in dim_animal_attributes table
+- Use primary_breed column for specific breed searches
+- Use breed_group for breed category searches
+- Always join on animal_attributes_key
+- CRITICAL: Some animals require primary_breed pattern matching:
+  * Rabbits: animal_type='Other' AND primary_breed LIKE 'Rabbit%' (e.g., 'Rabbit Sh', 'Rabbit Lh')
+  * Ducks: primary_breed LIKE 'Duck%' (returns actual ducks and ignores dog breeds with "duck" in the name)
+  * Goats: primary_breed LIKE 'Goat%'
+  * For standard dog/cat breeds: Use exact match like a.primary_breed = 'Golden Retriever'
+
+Example: "How many ducks came through the shelter?"
+SELECT COUNT(*) FROM fact_animal_outcome f 
+JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key
+WHERE a.primary_breed LIKE 'Duck%';
+
+Example: "How many goats were there?"
+SELECT COUNT(*) FROM fact_animal_outcome f 
+JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key
+WHERE a.primary_breed LIKE 'Goat%';
+
+## CRITICAL: DATE QUERIES
+- outcome_date_key = when the animal LEFT the shelter
+- intake_date_key = when the animal ENTERED the shelter
+- Use outcome_date_key for "when were animals adopted/transferred"
+- Use intake_date_key for "when were animals received"
+
+Example: "How many dogs adopted in 2020?"
+SELECT COUNT(*) FROM fact_animal_outcome f
+JOIN dim_animal_attributes a ON f.animal_attributes_key = a.animal_attributes_key
+JOIN dim_date d ON f.outcome_date_key = d.date_key
+JOIN dim_outcome_type o ON f.outcome_key = o.outcome_key
+WHERE a.animal_type = 'Dog' AND o.outcome_type = 'Adoption' AND d.year = 2020;
+
+## OUTCOME TYPE REFERENCE
+These are the exact outcome_type values in the database:
+  - Adoption (standard adoption)
+  - Rto-Adopt (Return to Adoption - animal returned and re-adopted)
+  - Transfer (to another facility)
+  - Return to Owner
+  - Euthanasia (or Euthanized)
+  - Died
+  - Disposal (rare)
+  - Missing
+
+Note: Use exact case matching. When filtering for "adoption" outcomes, consider including both 'Adoption' and 'Rto-Adopt'.
+
+## ANIMAL TYPE REFERENCE
+These are the exact animal_type values:
+  - Dog
+  - Cat
+  - Bird
+  - Livestock
+  - Other (includes rabbits and other small animals)
+
+IMPORTANT: Rabbits are stored in 'Other' category with primary_breed starting with 'Rabbit' (e.g., 'Rabbit Sh', 'Rabbit Lh')
+
+## COMMON PATTERNS
+- Count animals: SELECT COUNT(DISTINCT animal_id) or COUNT(*)
+- Filter by species: WHERE a.animal_type = 'Dog' or 'Cat'
+- Filter by outcome: WHERE o.outcome_type IN ('Adoption', 'Transfer')
+- Filter by date range: WHERE d.year = 2020 AND d.month = 6
+- Filter by breed: WHERE a.primary_breed = 'Exact Breed Name' (case-sensitive)
+- Group by outcome: GROUP BY o.outcome_type
+- Order results: ORDER BY count_column DESC

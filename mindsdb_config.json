@@ -1,0 +1,63 @@
+{
+  "project": "animal_shelter_analytics",
+  "database": "animal_shelter.duckdb",
+  "description": "Austin Animal Shelter Kimball Star Schema",
+  "data_source": "DuckDB",
+  "grain": "Individual animal outcome event",
+  "fact_table": "fact_animal_outcome",
+  "fact_table_rows": 172044,
+  "dimensions": [
+    {
+      "name": "dim_date",
+      "key": "date_key",
+      "purpose": "Outcome dates with temporal attributes",
+      "rows": 1461
+    },
+    {
+      "name": "dim_animal_attributes",
+      "key": "animal_attributes_key",
+      "purpose": "Animal identifiers, name, species, color, breed",
+      "rows": 16414
+    },
+    {
+      "name": "dim_outcome_type",
+      "key": "outcome_type_key",
+      "purpose": "Outcome disposition classifications",
+      "rows": 6
+    },
+    {
+      "name": "dim_sex_on_outcome",
+      "key": "sex_on_outcome_key",
+      "purpose": "Animal gender at outcome",
+      "rows": 3
+    },
+    {
+      "name": "dim_intake_details",
+      "key": "intake_details_key",
+      "purpose": "Intake type and animal condition",
+      "rows": 76
+    }
+  ],
+  "foreign_keys": [
+    {
+      "from": "fact_animal_outcome.date_key",
+      "to": "dim_date.date_key"
+    },
+    {
+      "from": "fact_animal_outcome.animal_attributes_key",
+      "to": "dim_animal_attributes.animal_attributes_key"
+    },
+    {
+      "from": "fact_animal_outcome.outcome_type_key",
+      "to": "dim_outcome_type.outcome_type_key"
+    },
+    {
+      "from": "fact_animal_outcome.sex_on_outcome_key",
+      "to": "dim_sex_on_outcome.sex_on_outcome_key"
+    },
+    {
+      "from": "fact_animal_outcome.intake_details_key",
+      "to": "dim_intake_details.intake_details_key"
+    }
+  ]
+}
