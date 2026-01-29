@@ -39,26 +39,26 @@
 │                           │                                                                                                           │
 │                           │ FK                                                                                                        │
 │                           │                                                                                                           │
-│  ┌────────────────────┐   │   ┌────────────────────┐   │   ┌─────────────────────┐   │   ┌──────────────────────┐                     │
-│  │ DIM_ANIMAL_        │   │   │ DIM_SEX_ON_        │   │   │ DIM_OUTCOME_        │   │   │ DIM_INTAKE_          │                     │
-│  │ ATTRIBUTES         │   │   │ OUTCOME            │   │   │ TYPE                │   │   │ DETAILS              │                     │
-│  ├────────────────────┤   │   ├────────────────────┤   │   ├─────────────────────┤   │   ├──────────────────────┤                     │
-│  │ animal_attributes_ │   │   │ sex_key (PK)       │   │   │ outcome_key (PK)    │   │   │ intake_details_key   │                     │
-│  │ key (PK)           │   │   │ sex_upon_outcome   │   │   │ outcome_type        │   │   │ (PK)                 │                     │
-│  │ animal_type        │   │   │ is_intact          │   │   │ outcome_subtype     │   │   │ intake_type          │                     │
-│  │ primary_breed      │   │   │ is_male            │   │   │ is_live_outcome     │   │   │ intake_condition     │                     │
-│  │ secondary_breed    │   │   │ is_female          │   │   │ stay_duration_      │   │   │ condition_severity   │                     │
-│  │ is_mixed_breed     │   │   │ age_group          │   │   │ category            │   │   │ has_condition_flag   │                     │
-│  │ breed_group        │   │   │ (~50-100 rows)     │   │   │ category            │   │   │ (~15-20 rows)        │                     │
-│  │ color              │   │   └─────────┬──────────┘   │   │ (~20-30 rows)       │   │   └──────────┬───────────┘                     │
-│  │ (~2-5K rows)       │   │             │              │   └──────────┬──────────┘   │              │                                 │
-│  └──────────┬─────────┘   │             │              │              │              │              │                                 │
-│             │             │             │              │              │              │              │                                 │
-│             │ FK          │             │              │              │              │              │                                 │
-│             │             │             │              │              │              │              │                                 │
-│             └─────────────┤─────────────┼──────────────┼──────────────┼──────────────┼──────────────┘                                 │
-│                           │             │              │              │              │                                                │
-│                           ▼             ▼              ▼              ▼              ▼                                                │
+│  ┌────────────────────┐   │   ┌────────────────────┐       ┌─────────────────────┐       ┌──────────────────────┐                     │
+│  │ DIM_ANIMAL_        │   │   │ DIM_SEX_ON_        │       │ DIM_OUTCOME_        │       │ DIM_INTAKE_          │                     │
+│  │ ATTRIBUTES         │   │   │ OUTCOME            │       │ TYPE                │       │ DETAILS              │                     │
+│  ├────────────────────┤   │   ├────────────────────┤       ├─────────────────────┤       ├──────────────────────┤                     │
+│  │ animal_attributes_ │   │   │ sex_key (PK)       │       │ outcome_key (PK)    │       │ intake_details_key   │                     │
+│  │ key (PK)           │   │   │ sex_upon_outcome   │       │ outcome_type        │       │ (PK)                 │                     │
+│  │ animal_type        │   │   │ is_intact          │       │ outcome_subtype     │       │ intake_type          │                     │
+│  │ primary_breed      │   │   │ is_male            │       │ is_live_outcome     │       │ intake_condition     │                     │
+│  │ secondary_breed    │   │   │ is_female          │       │ stay_duration_      │       │ condition_severity   │                     │
+│  │ is_mixed_breed     │   │   │ age_group          │       │ category            │       │ has_condition_flag   │                     │
+│  │ breed_group        │   │   │ (~50-100 rows)     │       │ category            │       │ (~15-20 rows)        │                     │
+│  │ color              │   │   └─────────┬──────────┘       │ (~20-30 rows)       │       └──────────┬───────────┘                     │
+│  │ (~2-5K rows)       │   │             │                  └──────────┬──────────┘                  │                                 │
+│  └──────────┬─────────┘   │             │                             │                             │                                 │
+│             │             │             │                             │                             │                                 │
+│             │ FK          │             │                             │                             │                                 │
+│             │             │             │                             │                             │                                 │
+│             └┤────────────┤─────────────┼─────────────────────────────┼────────────────────────┼────┘                                 │
+│              │            │             │                             │                        │                                      │
+│              ▼            ▼             ▼                             ▼                        ▼                                      │
 │        ┌──────────────────────────────────────────────────────────────────────────────────────────┐                                   │
 │        │                    FACT_ANIMAL_OUTCOME (172,338 rows)                                    │                                   │
 │        ├──────────────────────────────────────────────────────────────────────────────────────────┤                                   │
