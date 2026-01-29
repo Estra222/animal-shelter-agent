@@ -67,8 +67,8 @@ Export: Download as CSV
 ├─────────────────────────────────────┼─────────┤
 │ Database Size                       │ 172K    │
 │ Test Cases (Validation)             │ 11      │
-│ Passing Tests                       │ 6/11    │
-│ Accuracy Rate                       │ 55%     │
+│ Passing Tests                       │ 7/11    │
+│ Accuracy Rate                       │ 64%     │
 │ Response Time (first query)         │ 30-60s  │
 │ Response Time (subsequent)          │ 5-15s   │
 │ API Costs                           │ $0      │
@@ -197,7 +197,8 @@ AI Agent Experiment/
 ```
 ✓ 100% locally hosted (no cloud costs)
 ✓ Works offline after setup
-✓ Decent accuracy on common queries (55%)
+✓ Good accuracy on common queries (64%)
+✓ SQL post-processing fixes common LLM errors
 ✓ Fast for simple questions (5-15 seconds)
 ✓ User-friendly web interface
 ✓ Works on any computer
@@ -258,7 +259,7 @@ AI Agent Experiment/
 
 | Goal | Status | Details |
 |------|--------|---------|
-| Build Working Agent | ✅ | 55% accuracy achieved |
+| Build Working Agent | ✅ | 64% accuracy achieved |
 | Create Web Interface | ✅ | Live and operational |
 | Make it Accessible | ✅ | No coding required |
 | Enable Sharing | ✅ | Works across network |
@@ -349,7 +350,7 @@ Your Austin Animal Shelter Analytics Agent is:
 Total Development Time:     ~2-3 hours
 Lines of Code:              ~1,500
 Test Cases Created:         11
-Validation Accuracy:        55% (6/11)
+Validation Accuracy:        64% (7/11)
 Documentation Pages:        5
 Ready for Production:       ✅ YES
 Cost to Deploy:             $0

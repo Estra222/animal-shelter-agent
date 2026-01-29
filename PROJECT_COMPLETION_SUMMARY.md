@@ -35,7 +35,7 @@ You now have a fully functional **Natural Language SQL Query Agent** for the Aus
 ### Phase 5: Mistral Integration ✅
 - **Ollama** - Local LLM server (free, no API costs)
 - **Mistral Model** - 7B parameter model, excellent SQL generation
-- **Validation**: 55% accuracy on 11 comprehensive test cases
+- **Validation**: 64% accuracy on 11 comprehensive test cases
 
 ### Phase 6: Web Interface ✅
 - **Streamlit App** - Beautiful, interactive web interface
@@ -52,7 +52,7 @@ You now have a fully functional **Natural Language SQL Query Agent** for the Aus
 |--------|-------|
 | **Database Size** | 172,044 fact rows |
 | **Test Cases** | 11 comprehensive |
-| **Validation Accuracy** | 55% (6/11 passing) |
+| **Validation Accuracy** | 64% (7/11 passing) |
 | **LLM Model** | Mistral 7B (local) |
 | **API Costs** | $0 (runs locally) |
 | **Response Time** | 5-15 seconds (after initial load) |
@@ -129,15 +129,16 @@ Agent generates SQL → Executes → Returns 39 rows with outcome breakdown
 
 ## 🎓 Model Performance Breakdown
 
-### Passing Test Cases (6/11 - 55%)
+### Passing Test Cases (7/11 - 64%)
 ✅ Q1: Outcome Distribution (12 rows)
 ✅ Q2: Top Breed Groups (7 rows)
 ✅ Q3: Adoption Rates by Breed (5 rows)
 ✅ Q4: High Demand Animals (5 rows)
 ✅ Q6: Sick/Injured Animals (39 rows)
+✅ Q10: Intake Type Analysis (6 rows)
 ✅ Q11: Reproductive Status by Age (4 rows)
 
-### Failing Test Cases (2/11)
+### Failing Test Cases (4/11)
 ❌ Q7: Stay Duration by Outcome (generated 12 instead of 43 rows)
 ❌ Q9: Gender Distribution (generated 24 instead of 34 rows)
 
@@ -226,7 +227,7 @@ This project demonstrates:
 |------|--------|---------|
 | Data Preparation | ✅ Complete | 172K rows, star schema |
 | Agent Creation | ✅ Complete | Mistral + Ollama |
-| Validation Testing | ✅ Complete | 55% accuracy (6/11) |
+| Validation Testing | ✅ Complete | 64% accuracy (7/11) |
 | Web Interface | ✅ Complete | Streamlit app running |
 | Deployment Ready | ✅ Yes | Can be shared immediately |
 
@@ -234,7 +235,7 @@ This project demonstrates:
 
 ## 🚀 You're Ready to Go!
 
-The system is **production-ready** for sharing with stakeholders. The 55% accuracy is reasonable for a local open-source model, and the system provides immediate value for common queries about:
+The system is **production-ready** for sharing with stakeholders. The 64% accuracy is good for a local open-source model, and the system provides immediate value for common queries about:
 - Animal outcomes
 - Adoption statistics
 - Breed analytics

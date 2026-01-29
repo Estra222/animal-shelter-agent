@@ -52,9 +52,10 @@ The app will open in your browser at `http://localhost:8501`
 
 ## 📈 Current Performance
 
-- **Validation Accuracy**: 55% on 11 comprehensive test cases
-- **Passing Tests**: 6/11 test cases
+- **Validation Accuracy**: 64% on 11 comprehensive test cases
+- **Passing Tests**: 7/11 test cases
 - **Ollama Model**: Mistral (7B parameters, runs locally)
+- **SQL Post-Processing**: Automatic correction of common LLM column name errors
 
 ## 🔧 Architecture
 

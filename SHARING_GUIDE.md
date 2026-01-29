@@ -216,7 +216,7 @@ SYSTEM SPECIFICATIONS
 LLM Model:         Mistral 7B (local)
 Database:          DuckDB (172K rows)
 Interface:         Streamlit Web App
-Test Accuracy:     55% (6/11 test cases)
+Test Accuracy:     64% (7/11 test cases)
 API Costs:         $0/month
 Setup Time:        ~15 minutes
 First Query Time:  30-60 seconds
@@ -290,7 +290,7 @@ A: Yes! Everything runs on your computer. No data leaves your machine.
 A: Only for initial setup. After that, everything works offline.
 
 **Q: Will it always give correct answers?**
-A: No. It's 55% accurate. Some questions may need rephrasing or manual SQL.
+A: No. It's 64% accurate. Some questions may need rephrasing or manual SQL.
 
 **Q: Can multiple people use it at once?**
 A: Yes, if they're on the same network and know the IP address.

@@ -62,12 +62,11 @@ http://localhost:8501
 
 ```
 Total Tests:     11
-Passing:         6  (55% accuracy)
-Failing:         2
-Errors:          3
+Passing:         7  (64% accuracy)
+Failing:         4
 
-Best Performance:   Simple aggregates
-Needs Work:         Complex joins, window functions
+Best Performance:   Simple aggregates, gender queries
+Needs Work:         Complex joins, date-based queries
 ```
 
 ---

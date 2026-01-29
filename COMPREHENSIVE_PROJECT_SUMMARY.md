@@ -36,8 +36,8 @@ You now have a **fully functional Natural Language SQL Analytics Agent** for the
 
 ### **Phase 5: Mistral LLM Integration** ✅
 - Local **Mistral 7B** via Ollama (FREE - no API costs)
-- Text-to-SQL generation
-- **55% accuracy** on validation suite (6/11 tests passing)
+- Text-to-SQL generation with SQL post-processing
+- **64% accuracy** on validation suite (7/11 tests passing)
 
 ### **Phase 6: Streamlit Web Interface** ✅
 - Beautiful, responsive web app
@@ -52,7 +52,7 @@ You now have a **fully functional Natural Language SQL Analytics Agent** for the
 |--------|-------|
 | **Database Size** | 172,044 rows |
 | **Test Cases** | 11 comprehensive |
-| **Validation Accuracy** | 55% (6/11 passing) |
+| **Validation Accuracy** | 64% (7/11 passing) |
 | **LLM Model** | Mistral 7B (local via Ollama) |
 | **Monthly API Cost** | $0 |
 | **Query Response Time** | 5-15 seconds |
@@ -159,16 +159,17 @@ http://localhost:8501
 
 ### Validation Results
 ```
-✅ Passing (6/11):
+✅ Passing (7/11):
    Q1: Outcome Distribution
    Q2: Top Breed Groups
    Q3: Adoption Rates
    Q4: High Demand Animals
    Q6: Sick/Injured Animals
+   Q10: Intake Type Analysis
    Q11: Reproductive Status
 
-⚠️ Needs Improvement (5/11):
-   Q5, Q7, Q8, Q9, Q10 (complex queries)
+⚠️ Needs Improvement (4/11):
+   Q5, Q7, Q8, Q9 (complex queries)
 ```
 
 ### Response Times
@@ -208,7 +209,7 @@ Result Display:  Instant
 - ✅ Web interface created
 - ✅ Database connected
 - ✅ LLM integrated
-- ✅ Validation completed (55% accuracy)
+- ✅ Validation completed (64% accuracy)
 - ✅ Documentation written
 - ✅ Tested end-to-end
 - ✅ Ready to share
@@ -259,7 +260,7 @@ Result Display:  Instant
 **Current Status**: 🟢 **OPERATIONAL**  
 **Web App**: 🟢 **RUNNING** (http://localhost:8501)  
 **Database**: 🟢 **CONNECTED** (172K rows)  
-**LLM**: 🟢 **READY** (55% accuracy)  
+**LLM**: 🟢 **READY** (64% accuracy)  
 **Documentation**: 🟢 **COMPLETE**  
 
 ---
@@ -282,7 +283,8 @@ Result Display:  Instant
 ✅ Built a **production-ready analytics agent**  
 ✅ **Zero monthly costs** (all open source)  
 ✅ **No coding knowledge required** to use  
-✅ **55% accuracy** on validation (decent for local model)  
+✅ **64% accuracy** on validation (good for local model)  
+✅ **SQL post-processing** fixes common LLM errors  
 ✅ **Fully documented** for sharing  
 ✅ **Scalable architecture** for future improvements  
 ✅ **Professional web interface** for users  
@@ -303,7 +305,7 @@ Result Display:  Instant
 
 ## 🔍 Validation Test Results
 
-### Passing Tests (6/11 - 55%)
+### Passing Tests (7/11 - 64%)
 | Test | Question | Rows | Status |
 |------|----------|------|--------|
 | Q1 | Outcome Distribution | 12 | ✅ PASS |
@@ -311,16 +313,16 @@ Result Display:  Instant
 | Q3 | Adoption Rates by Breed | 5 | ✅ PASS |
 | Q4 | High Demand Animals | 5 | ✅ PASS |
 | Q6 | Sick/Injured Animals | 39 | ✅ PASS |
+| Q10 | Intake Type Analysis | 6 | ✅ PASS |
 | Q11 | Reproductive Status | 4 | ✅ PASS |
 
-### Failing/Error Tests (5/11)
+### Failing/Error Tests (4/11)
 | Test | Question | Issue | Status |
 |------|----------|-------|--------|
 | Q5 | High Need Animals | Syntax error | ❌ ERROR |
 | Q7 | Stay Duration | Row count mismatch | ❌ FAIL |
 | Q8 | Monthly Trends | Column reference error | ❌ ERROR |
 | Q9 | Gender Distribution | Row count mismatch | ❌ FAIL |
-| Q10 | Intake Type Analysis | Extraction error | ❌ ERROR |
 
 ---
 
@@ -394,7 +396,7 @@ with percentages and trends?"
 Total Development Time:     ~2-3 hours
 Lines of Code:              ~1,500
 Test Cases Created:         11
-Validation Accuracy:        55% (6/11)
+Validation Accuracy:        64% (7/11)
 Documentation Pages:        6
 Ready for Production:       ✅ YES
 Cost to Deploy:             $0

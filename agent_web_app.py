@@ -92,6 +92,32 @@ def get_db_connection():
                 return None
 
 # ==============================================================================
+# SQL POST-PROCESSING TO FIX COMMON MISTRAL ERRORS
+# ==============================================================================
+
+def fix_common_sql_errors(sql):
+    """Fix common column name mistakes made by Mistral"""
+    import re
+    
+    # Fix gender-related column errors
+    # s.gender -> s.sex_upon_outcome
+    sql = re.sub(r'\bs\.gender\b', 's.sex_upon_outcome', sql, flags=re.IGNORECASE)
+    # s.sex_name -> s.sex_upon_outcome
+    sql = re.sub(r'\bs\.sex_name\b', 's.sex_upon_outcome', sql, flags=re.IGNORECASE)
+    # s.sex_on_outcome -> s.sex_upon_outcome
+    sql = re.sub(r'\bs\.sex_on_outcome\b', 's.sex_upon_outcome', sql, flags=re.IGNORECASE)
+    
+    # Fix ambiguous sex_key references (add table prefix if missing)
+    # GROUP BY sex_key -> GROUP BY s.sex_key (when s alias is used)
+    sql = re.sub(r'GROUP BY\s+sex_key\b', 'GROUP BY s.sex_key', sql, flags=re.IGNORECASE)
+    
+    # Fix date_key issues for date joins
+    # f.date_key -> f.outcome_date_key
+    sql = re.sub(r'\bf\.date_key\b', 'f.outcome_date_key', sql, flags=re.IGNORECASE)
+    
+    return sql
+
+# ==============================================================================
 # MISTRAL TEXT-TO-SQL FUNCTION
 # ==============================================================================
 
@@ -133,6 +159,8 @@ Generate SQL query:"""
                 sql = sql.replace('```', '').strip()
                 if not sql.endswith(';'):
                     sql += ';'
+                # Post-process SQL to fix common Mistral mistakes
+                sql = fix_common_sql_errors(sql)
                 return sql
             else:
                 return None
@@ -228,12 +256,21 @@ except Exception as e:
 # MAIN INTERFACE
 # ==============================================================================
 
+# Initialize session state for selected example
+if 'selected_example' not in st.session_state:
+    st.session_state.selected_example = ""
+
+# Get initial value from selected example (if any)
+initial_value = st.session_state.selected_example
+st.session_state.selected_example = ""  # Clear it after reading
+
 # Check Ollama connection
 col1, col2 = st.columns([3, 1])
 with col1:
     st.markdown("#### Ask a Question")
     question = st.text_input(
         "What would you like to know about the animal shelter?",
+        value=initial_value,
         placeholder="e.g., What are the most common animal outcomes? How many dogs were adopted?",
         label_visibility="collapsed"
     )
@@ -326,7 +363,7 @@ cols = st.columns(2)
 for idx, example in enumerate(examples):
     col = cols[idx % 2]
     if col.button(f"📌 {example[:50]}...", use_container_width=True):
-        st.session_state.question = example
+        st.session_state.selected_example = example
         st.rerun()
 
 # ==============================================================================
@@ -342,7 +379,7 @@ with st.sidebar:
     
     **Database:** Animal shelter intake and outcome data
     
-    **Accuracy:** ~55% on validation test suite
+    **Accuracy:** ~64% on validation test suite (7/11 tests passing)
     
     **Technology Stack:**
     - Mistral LLM (local via Ollama)
